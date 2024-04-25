@@ -7,7 +7,7 @@ const messageRoutes = require("./routes/message");
 const lobbyRoutes = require("./routes/lobby");
 
 const app = express();
-const port = 3001;
+const port = 80;
 
 app.use(bodyParser.json());
 
