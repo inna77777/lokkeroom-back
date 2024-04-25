@@ -146,7 +146,7 @@ exports.sendUserToUserMess = async (req, res) => {
       }
 
       const inputedValues = await pool.query(
-        "INSERT INTO messages (chat_id, content) VALUES($1, $2) RETURNING *",
+        "INSERT INTO chats_messages (chat_id, content) VALUES($1, $2) RETURNING *",
         [chatId, message]
       );
 
