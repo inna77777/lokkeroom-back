@@ -116,21 +116,74 @@ exports.deleteMessage = async (req, res) => {
 };
 
 exports.sendUserToUserMess = async (req, res) => {
-  const { recId } = req.params;
-  const { id: userId } = req.user;
-  const { message } = req.body;
+    const { recId } = req.params;
+    const { id: userId } = req.user;
+    const { message } = req.body;
 
+    try {
+      const checkChatQuery = {
+        text: `
+        SELECT id
+        FROM chats
+        WHERE (user_id = $1 AND chat_with_id = $2) OR (user_id = $2 AND chat_with_id = $1)
+      `,
+        values: [userId, recId],
+      };
+
+      const checkChatResult = await pool.query(checkChatQuery);
+      const chatId = checkChatResult.rows[0]?.id;
+
+      if (!chatId) {
+        const createChatQuery = {
+          text: `
+          INSERT INTO chats (user_id, chat_with_id) VALUES($1, $2) RETURNING id
+        `,
+          values: [userId, recId],
+        };
+
+        const createChatResult = await pool.query(createChatQuery);
+        chatId = createChatResult.rows[0].id;
+      }
+
+      const inputedValues = await pool.query(
+        "INSERT INTO messages (chat_id, content) VALUES($1, $2) RETURNING *",
+        [chatId, message]
+      );
+
+      res.json({
+        message: "message was sent",
+        content: inputedValues.rows[0],
+      });
+    } catch (err) {
+      console.error("Error occurred while adding user to lobby:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+
+  // try {
+  //   const inputedValues = await pool.query(
+  //     "INSERT INTO private_messages (content, user_sender_id, user_receiver_id) VALUES($1,$2,$3) RETURNING *",
+  //     [message, userId, recId]
+  //   );
+  //   res.json({
+  //     message: "message was sent",
+  //     content: inputedValues.rows[0],
+  //   });
+  // } catch (err) {
+  //   console.error("Error occurred while adding user to lobby:", err);
+  //   res.status(500).json({ error: "Internal Server Error" });
+  // }
+};
+
+exports.getUserChats = async (req, res, next) => {
+  const { id } = req.user;
   try {
-    const inputedValues = await pool.query(
-      "INSERT INTO private_messages (content, user_sender_id, user_receiver_id) VALUES($1,$2,$3) RETURNING *",
-      [message, userId, recId]
+    const userChats = await pool.query(
+      "SELECT u.nickname FROM users u INNER JOIN private_messages pm ON u.id = ul.lobby_id WHERE ul.user_id = $1",
+      [id]
     );
-    res.json({
-      message: "message was sent",
-      content: inputedValues.rows[0],
-    });
+    res.json({ chats: userChats.rows });
   } catch (err) {
-    console.error("Error occurred while adding user to lobby:", err);
+    console.error("Error occurred while getting user lobbies:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
