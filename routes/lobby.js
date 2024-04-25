@@ -48,4 +48,6 @@ router.post(
   lobbyGuard,
   lobbyController.removeUserFromLobby
 );
+
+router.get("/user/lobbies", lobbyController.getUserLobbies);
 module.exports = router;
