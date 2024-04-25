@@ -143,8 +143,7 @@ exports.getUserLobbies = async (req, res, next) => {
       "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1",
       [id]
     );
-    req.userLobbies = userLobbies.rows;
-    next();
+    res.json({ lobbies: userLobbies.rows });
   } catch (err) {
     console.error("Error occurred while getting user lobbies:", err);
     res.status(500).json({ error: "Internal Server Error" });
