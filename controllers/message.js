@@ -116,48 +116,48 @@ exports.deleteMessage = async (req, res) => {
 };
 
 exports.sendUserToUserMess = async (req, res) => {
-    const { recId } = req.params;
-    const { id: userId } = req.user;
-    const { message } = req.body;
+  const { recId } = req.params;
+  const { id: userId } = req.user;
+  const { message } = req.body;
 
-    try {
-      const checkChatQuery = {
-        text: `
+  try {
+    const checkChatQuery = {
+      text: `
         SELECT id
         FROM chats
         WHERE (user_id = $1 AND chat_with_id = $2) OR (user_id = $2 AND chat_with_id = $1)
       `,
+      values: [userId, recId],
+    };
+
+    const checkChatResult = await pool.query(checkChatQuery);
+    const chatId = checkChatResult.rows[0]?.id;
+
+    if (!chatId) {
+      const createChatQuery = {
+        text: `
+          INSERT INTO chats (user_id, chat_with_id) VALUES($1, $2) RETURNING id
+        `,
         values: [userId, recId],
       };
 
-      const checkChatResult = await pool.query(checkChatQuery);
-      const chatId = checkChatResult.rows[0]?.id;
-
-      if (!chatId) {
-        const createChatQuery = {
-          text: `
-          INSERT INTO chats (user_id, chat_with_id) VALUES($1, $2) RETURNING id
-        `,
-          values: [userId, recId],
-        };
-
-        const createChatResult = await pool.query(createChatQuery);
-        chatId = createChatResult.rows[0].id;
-      }
-
-      const inputedValues = await pool.query(
-        "INSERT INTO chats_messages (chat_id, content) VALUES($1, $2) RETURNING *",
-        [chatId, message]
-      );
-
-      res.json({
-        message: "message was sent",
-        content: inputedValues.rows[0],
-      });
-    } catch (err) {
-      console.error("Error occurred while adding user to lobby:", err);
-      res.status(500).json({ error: "Internal Server Error" });
+      const createChatResult = await pool.query(createChatQuery);
+      chatId = createChatResult.rows[0].id;
     }
+
+    const inputedValues = await pool.query(
+      "INSERT INTO chats_messages (chat_id, content) VALUES($1, $2) RETURNING *",
+      [chatId, message]
+    );
+
+    res.json({
+      message: "message was sent",
+      content: inputedValues.rows[0],
+    });
+  } catch (err) {
+    console.error("Error occurred while adding user to lobby:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 
   // try {
   //   const inputedValues = await pool.query(
@@ -175,15 +175,17 @@ exports.sendUserToUserMess = async (req, res) => {
 };
 
 exports.getUserChats = async (req, res, next) => {
-  const { id } = req.user;
+  const { id: userId } = req.user;
+
   try {
-    const userChats = await pool.query(
-      "SELECT u.nickname FROM users u INNER JOIN private_messages pm ON u.id = ul.lobby_id WHERE ul.user_id = $1",
-      [id]
+    const result = await pool.query(
+      "SELECT DISTINCT u.nickname FROM chats_messages m JOIN chats c ON m.chat_id = c.id JOIN users u ON (c.user_id = u.id OR c.chat_with_id = u.id) WHERE (c.user_id = $1 OR c.chat_with_id = $1) AND u.id NOT IN ($1) ORDER BY m.created_at DESC",
+      [userId]
     );
-    res.json({ chats: userChats.rows });
+
+    res.json(result.rows);
   } catch (err) {
-    console.error("Error occurred while getting user lobbies:", err);
+    console.error("Error occurred while fetching chat partners:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
