@@ -141,7 +141,7 @@ exports.getUserLobbies = async (req, res, next) => {
   try {
     const userLobbies = await pool.query(
       "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1",
-      [id]
+      [userId]
     );
     res.json({ lobbies: userLobbies.rows });
   } catch (err) {
