@@ -137,11 +137,11 @@ exports.removeUserFromLobby = async (req, res) => {
 };
 
 exports.getUserLobbies = async (req, res, next) => {
-  const { userId } = req.user;
+  const { id } = req.user;
   try {
     const userLobbies = await pool.query(
       "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1",
-      [userId]
+      [id]
     );
     res.json({ lobbies: userLobbies.rows });
   } catch (err) {
