@@ -74,7 +74,7 @@ exports.getUserData = async (req, res, next) => {
   const { id } = req.user;
   try {
     const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-    res.json({ user: user.rows[0] });
+    res.json({ user: user.rows});
   } catch (err) {
     console.error("Error occurred while getting user data:", err);
     res.status(500).json({ error: "Internal Server Error" });
