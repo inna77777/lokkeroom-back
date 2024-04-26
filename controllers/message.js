@@ -179,7 +179,15 @@ exports.getUserChats = async (req, res, next) => {
 
   try {
     const result = await pool.query(
-      "SELECT DISTINCT u.nickname FROM chats_messages m JOIN chats c ON m.chat_id = c.id JOIN users u ON (c.user_id = u.id OR c.chat_with_id = u.id) WHERE (c.user_id = $1 OR c.chat_with_id = $1) AND u.id NOT IN ($1) ORDER BY m.created_at DESC",
+      `
+      SELECT DISTINCT u.nickname
+      FROM chats c
+      JOIN chats c2 ON c.id = c2.chat_with_id OR c.chat_with_id = c2.id
+      JOIN users u ON (c2.user_id = u.id)
+      WHERE (c.user_id = $1 OR c.chat_with_id = $1)
+      AND u.id != $1
+      ORDER BY c2.created_at DESC
+      `,
       [userId]
     );
 
