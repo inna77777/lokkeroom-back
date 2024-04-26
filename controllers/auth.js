@@ -31,7 +31,6 @@ exports.loginUser = async (req, res) => {
   const { login, password } = req.body;
 
   try {
-    // Check if there are too many recent failed login attempts for this user
     const failedAttempts = await pool.query(
       "SELECT COUNT(*) AS count FROM failed_login_attempts WHERE login = $1 AND timestamp >= NOW() - interval '1 hour'",
       [login]
@@ -51,7 +50,6 @@ exports.loginUser = async (req, res) => {
       user.rows.length === 0 ||
       !(await bcrypt.compare(password, user.rows[0].password))
     ) {
-      // Record failed login attempt
       await pool.query(
         "INSERT INTO failed_login_attempts (login) VALUES ($1)",
         [login]
@@ -60,7 +58,6 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid login or password" });
     }
 
-    // Clear failed login attempts upon successful login
     await pool.query("DELETE FROM failed_login_attempts WHERE login = $1", [
       login,
     ]);
@@ -69,6 +66,17 @@ exports.loginUser = async (req, res) => {
     res.json({ token });
   } catch (err) {
     console.error("Error executing database query:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getUserData = async (req, res, next) => {
+  const { id } = req.user;
+  try {
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    res.json({ user: user.rows[0] });
+  } catch (err) {
+    console.error("Error occurred while getting user data:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
