@@ -180,18 +180,20 @@ exports.getUserChats = async (req, res, next) => {
   try {
     const result = await pool.query(
       `
-      SELECT DISTINCT u.nickname
+      SELECT DISTINCT u.nickname, m.created_at
       FROM chats c
       JOIN chats c2 ON c.id = c2.chat_with_id OR c.chat_with_id = c2.id
+      JOIN chats_messages m ON c2.id = m.chat_id
       JOIN users u ON (c2.user_id = u.id)
       WHERE (c.user_id = $1 OR c.chat_with_id = $1)
       AND u.id != $1
-      ORDER BY c2.created_at DESC
+      ORDER BY m.created_at DESC
       `,
       [userId]
     );
 
-    res.json(result.rows);
+
+    res.json({ chats: result.rows });
   } catch (err) {
     console.error("Error occurred while fetching chat partners:", err);
     res.status(500).json({ error: "Internal Server Error" });
