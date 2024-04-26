@@ -180,7 +180,7 @@ exports.getUserChats = async (req, res, next) => {
   try {
     const result = await pool.query(
       `
-      SELECT DISTINCT u.nickname, m.created_at
+      SELECT c2.*, m.*, u.nickname
       FROM chats c
       JOIN chats c2 ON c.id = c2.chat_with_id OR c.chat_with_id = c2.id
       JOIN chats_messages m ON c2.id = m.chat_id
@@ -191,7 +191,6 @@ exports.getUserChats = async (req, res, next) => {
       `,
       [userId]
     );
-
 
     res.json({ chats: result.rows });
   } catch (err) {
