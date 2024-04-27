@@ -180,11 +180,15 @@ exports.getUserChats = async (req, res, next) => {
   try {
     const result = await pool.query(
       `
-      SELECT DISTINCT c.id, u.nickname,cm.created_at 
+      SELECT DISTINCT c.id, u.nickname, cm.created_at
         FROM chats c
-          JOIN users u ON (c.chat_with_id = u.id AND c.user_id = $1) OR (c.user_id = u.id AND c.chat_with_id = $1)
-          JOIN chats_messages cm ON c.id = cm.chat_id
-          ORDER BY cm.created_at DESC;
+        JOIN users u ON (c.chat_with_id = u.id AND c.user_id = $1) OR (c.user_id = u.id AND c.chat_with_id = $1)
+        JOIN (
+          SELECT chat_id, MAX(created_at) AS created_at
+          FROM chats_messages
+          GROUP BY chat_id
+        ) cm ON c.id = cm.chat_id
+        ORDER BY cm.created_at DESC;
       `,
       [userId]
     );
