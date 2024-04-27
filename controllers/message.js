@@ -146,8 +146,8 @@ exports.sendUserToUserMess = async (req, res) => {
     }
 
     const inputedValues = await pool.query(
-      "INSERT INTO chats_messages (chat_id, content) VALUES($1, $2) RETURNING *",
-      [chatId, message]
+      "INSERT INTO chats_messages (chat_id, content, user_id) VALUES($1, $2) RETURNING *",
+      [chatId, message, userId]
     );
 
     res.json({
@@ -196,11 +196,29 @@ exports.getUserChats = async (req, res, next) => {
   }
 };
 
-      // SELECT DISTINCT nickname
-      //   FROM (
-      //     SELECT u.nickname, cm.created_at
-      //     FROM chats c
-      //     JOIN users u ON (c.chat_with_id = u.id AND c.user_id = $1) OR (c.user_id = u.id AND c.chat_with_id = $1)
-      //     JOIN chats_messages cm ON c.id = cm.chat_id
-      //     ORDER BY cm.created_at DESC
-      //   ) AS subquery;
+exports.getChatMessages = async (req, res, next) => {
+  const { chatId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM chats_messages WHERE chat_id = $1
+      `,
+      [chatId]
+    );
+
+    res.json({ chat_messages: result.rows });
+  } catch (err) {
+    console.error("Error occurred while fetching chat partners:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// SELECT DISTINCT nickname
+//   FROM (
+//     SELECT u.nickname, cm.created_at
+//     FROM chats c
+//     JOIN users u ON (c.chat_with_id = u.id AND c.user_id = $1) OR (c.user_id = u.id AND c.chat_with_id = $1)
+//     JOIN chats_messages cm ON c.id = cm.chat_id
+//     ORDER BY cm.created_at DESC
+//   ) AS subquery;

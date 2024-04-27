@@ -31,4 +31,7 @@ router.post(
 
 router.get("/api/user/chats", authGuard, messageController.getUserChats);
 
+
+router.get("/api/chat/:chatId", authGuard, messageController.getChatMessages);
+
 module.exports = router;

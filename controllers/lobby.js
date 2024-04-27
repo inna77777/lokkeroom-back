@@ -69,6 +69,7 @@ exports.getLobbySingleMessages = async (req, res) => {
     res.json({ error: "Internal Server Error" });
   }
 };
+
 exports.getLobbyMessages = async (req, res) => {
   const { lobbyId } = req.params;
   try {
