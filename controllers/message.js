@@ -131,7 +131,7 @@ exports.sendUserToUserMess = async (req, res) => {
     };
 
     const checkChatResult = await pool.query(checkChatQuery);
-    const chatId = checkChatResult.rows[0]?.id;
+    const chatId = checkChatResult.rows[0]?.chat_id;
 
     if (!chatId) {
       const createChatQuery = {
