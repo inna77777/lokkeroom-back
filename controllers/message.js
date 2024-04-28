@@ -187,7 +187,7 @@ exports.getUserChats = async (req, res, next) => {
           SELECT chat_id, MAX(created_at) AS created_at
           FROM chats_messages
           GROUP BY chat_id
-        ) cm ON c.id = cm.chat_id
+        ) cm ON c.chat_id = cm.chat_id
         ORDER BY cm.created_at DESC;
       `,
       [userId]
