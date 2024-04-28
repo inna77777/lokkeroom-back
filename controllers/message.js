@@ -123,7 +123,7 @@ exports.sendUserToUserMess = async (req, res) => {
   try {
     const checkChatQuery = {
       text: `
-        SELECT id
+        SELECT chat_id
         FROM chats
         WHERE (user_id = $1 AND chat_with_id = $2) OR (user_id = $2 AND chat_with_id = $1)
       `,
