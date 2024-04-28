@@ -218,6 +218,24 @@ exports.getChatMessages = async (req, res, next) => {
   }
 };
 
+exports.getChatUser = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM users WHERE id = $1
+      `,
+      [userId]
+    );
+
+    res.json({ user: result.rows[0] });
+  } catch (err) {
+    console.error("Error occurred while fetching chat partners:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // SELECT DISTINCT nickname
 //   FROM (
 //     SELECT u.nickname, cm.created_at
