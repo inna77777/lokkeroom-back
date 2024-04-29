@@ -87,11 +87,11 @@ exports.getLobbyMessages = async (req, res) => {
 exports.getLobbyInfo = async (req, res) => {
   const { lobbyId } = req.params;
   try {
-    const messages = await pool.query(
+    const info = await pool.query(
       "SELECT * FROM lobbies WHERE id = $1",
       [lobbyId]
     );
-    res.json({ info: messages.rows });
+    res.json({ info: info.rows[0] });
   } catch (err) {
     console.error("Error occurred get l:", err);
     res.json({ error: "Internal Server Error" });
