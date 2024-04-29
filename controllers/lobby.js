@@ -164,4 +164,14 @@ exports.getUserLobbies = async (req, res, next) => {
   }
 };
 
+exports.getPlatformUsers = async (req, res, next) => {
+  try {
+    const users = await pool.query("SELECT * FROM users");
+    res.json({ users: users.rows });
+  } catch (err) {
+    console.error("Error occurred while getting user lobbies:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1"

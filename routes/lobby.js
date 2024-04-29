@@ -55,5 +55,6 @@ router.post(
   lobbyController.removeUserFromLobby
 );
 
-router.get("/user/lobbies",authGuard, lobbyController.getUserLobbies);
+router.get("/user/lobbies", authGuard, lobbyController.getUserLobbies);
+router.get("/community", authGuard, lobbyController.getPlatformUsers);
 module.exports = router;
