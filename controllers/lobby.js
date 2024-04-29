@@ -165,8 +165,9 @@ exports.getUserLobbies = async (req, res, next) => {
 };
 
 exports.getPlatformUsers = async (req, res, next) => {
+  const { id } = req.user;
   try {
-    const users = await pool.query("SELECT * FROM users");
+    const users = await pool.query("SELECT * FROM users WHERE id != $1", [id]);
     res.json({ users: users.rows });
   } catch (err) {
     console.error("Error occurred while getting user lobbies:", err);

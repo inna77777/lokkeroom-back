@@ -57,4 +57,6 @@ router.post(
 
 router.get("/user/lobbies", authGuard, lobbyController.getUserLobbies);
 router.get("/community", authGuard, lobbyController.getPlatformUsers);
+
+
 module.exports = router;
