@@ -91,7 +91,7 @@ exports.getLobbyInfo = async (req, res) => {
       "SELECT * FROM lobbies WHERE id = $1",
       [lobbyId]
     );
-    res.json({ messages: messages.rows });
+    res.json({ info: messages.rows });
   } catch (err) {
     console.error("Error occurred get l:", err);
     res.json({ error: "Internal Server Error" });
