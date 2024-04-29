@@ -28,6 +28,12 @@ router.get(
   lobbyController.getLobbyMessages
 );
 router.get(
+  "/api/lobby/info/:lobbyId",
+  authGuard,
+  lobbyGuard,
+  lobbyController.getLobbyInfo
+);
+router.get(
   "/api/lobby/:lobbyId/:messageId",
   authGuard,
   lobbyGuard,
