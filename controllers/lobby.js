@@ -87,10 +87,9 @@ exports.getLobbyMessages = async (req, res) => {
 exports.getLobbyInfo = async (req, res) => {
   const { lobbyId } = req.params;
   try {
-    const info = await pool.query(
-      "SELECT * FROM lobbies WHERE id = $1",
-      [lobbyId]
-    );
+    const info = await pool.query("SELECT * FROM lobbies WHERE id = $1", [
+      lobbyId,
+    ]);
     res.json({ info: info.rows[0] });
   } catch (err) {
     console.error("Error occurred get l:", err);
@@ -155,7 +154,7 @@ exports.getUserLobbies = async (req, res, next) => {
   const { id } = req.user;
   try {
     const userLobbies = await pool.query(
-      "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1",
+      "SELECT l.*, m.lobby_id, MAX(m.created_at) AS latest_message_time  FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id INNER JOIN messages m ON l.id = m.lobby_id WHERE ul.user_id = $1 GROUP BY l.id, m.lobby_id ORDER BY latest_message_time DESC;",
       [id]
     );
     res.json({ lobbies: userLobbies.rows });
@@ -164,3 +163,5 @@ exports.getUserLobbies = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1"
