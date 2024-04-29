@@ -99,7 +99,7 @@ exports.getLobbyInfo = async (req, res) => {
 
 exports.addUserToLobby = async (req, res) => {
   const { lobbyId } = req.params;
-  const { userId } = req.body;
+  const { userId } = req.params;
 
   try {
     const userInLobby = await pool.query(
@@ -125,7 +125,7 @@ exports.addUserToLobby = async (req, res) => {
 
 exports.removeUserFromLobby = async (req, res) => {
   const { lobbyId } = req.params;
-  const { userId } = req.body;
+  const { userId } = req.params;
 
   try {
     const userInLobby = await pool.query(
