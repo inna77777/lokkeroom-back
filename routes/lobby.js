@@ -41,14 +41,14 @@ router.get(
   lobbyController.getLobbySingleMessages
 );
 router.post(
-  "/api/lobby/:lobbyId/add-user/userId",
+  "/api/lobby/:lobbyId/add-user/:userId",
   authGuard,
   adminGuard,
   lobbyGuard,
   lobbyController.addUserToLobby
 );
 router.post(
-  "/api/lobby/:lobbyId/remove-user/userId",
+  "/api/lobby/:lobbyId/remove-user/:userId",
   authGuard,
   adminGuard,
   lobbyGuard,
