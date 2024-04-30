@@ -154,7 +154,21 @@ exports.getUserLobbies = async (req, res, next) => {
   const { id } = req.user;
   try {
     const userLobbies = await pool.query(
-      "SELECT l.id, l.name, CASE WHEN COUNT(m.id) > 0 THEN MAX(m.created_at) ELSE NULL END latest_message_time FROM lobbies l LEFT JOIN messages m ON l.id = m.lobby_id INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1 GROUP BY l.id ORDER BY latest_message_time DESC;",
+      `SELECT l.id, l.name,
+        CASE
+          WHEN COUNT(m.id) > 0 THEN MAX(m.created_at)
+          ELSE l.created_at
+            END AS latest_message_time
+      FROM lobbies l
+      LEFT JOIN messages m ON l.id = m.lobby_id
+      INNER JOIN users_lobbies ul ON l.id = ul.lobby_id
+      WHERE ul.user_id = 1
+      GROUP BY l.id
+      ORDER BY
+        CASE
+          WHEN COUNT(m.id) > 0 THEN MAX(m.created_at)
+          ELSE l.created_at
+        END DESC;`,
       [id]
     );
     res.json({ lobbies: userLobbies.rows });
