@@ -162,7 +162,7 @@ exports.getUserLobbies = async (req, res, next) => {
       FROM lobbies l
       LEFT JOIN messages m ON l.id = m.lobby_id
       INNER JOIN users_lobbies ul ON l.id = ul.lobby_id
-      WHERE ul.user_id = 1
+      WHERE ul.user_id = $1
       GROUP BY l.id
       ORDER BY
         CASE
