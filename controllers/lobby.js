@@ -74,7 +74,7 @@ exports.getLobbyMessages = async (req, res) => {
   const { lobbyId } = req.params;
   try {
     const messages = await pool.query(
-      "SELECT * FROM messages WHERE lobby_id = $1",
+      "SELECT u.nickname, m.* FROM messages m inner join users u on u.id = m.user_id WHERE lobby_id = $1",
       [lobbyId]
     );
     res.json({ messages: messages.rows });
