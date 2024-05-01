@@ -4,10 +4,8 @@ const pool = require("../db");
 
 exports.registerUser = async (req, res) => {
   const { login, password, nickname, description } = req.body;
-  const image = req.file;
 
   try {
-    const imageUrl = image.path;
 
     const existingUser = await pool.query(
       "SELECT login FROM users WHERE login = $1",
@@ -19,7 +17,7 @@ exports.registerUser = async (req, res) => {
     const bcryptPassword = await bcrypt.hash(password, 12);
     const insertValues = await pool.query(
       "INSERT INTO users (login, password, nickname, description, image) VALUES($1, $2,$3,$4, $5) RETURNING *",
-      [login, bcryptPassword, nickname, description, imageUrl]
+      [login, bcryptPassword, nickname, description]
     );
     res.json({ user: insertValues.rows[0] });
   } catch (err) {

@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 
 const cors = require("cors");
-const path = require("path");
 
 const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/message");
@@ -14,14 +13,6 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.originalname);
-  },
-});
 
 app.use(bodyParser.json());
 
@@ -32,8 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/images", express.static(path.join(__dirname, "images")));
-app.use(multer({ storage: fileStorage }).single("image"));
 
 app.use(authRoutes);
 app.use(messageRoutes);
