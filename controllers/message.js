@@ -136,7 +136,7 @@ exports.sendUserToUserMess = async (req, res) => {
     if (!chatId) {
       const createChatQuery = {
         text: `
-          INSERT INTO chats (user_id, chat_with_id) VALUES($1, $2) RETURNING id
+          INSERT INTO chats (user_id, chat_with_id) VALUES($1, $2) RETURNING chat_id
         `,
         values: [userId, recId],
       };
