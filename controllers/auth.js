@@ -5,9 +5,10 @@ const pool = require("../db");
 exports.registerUser = async (req, res) => {
   const { login, password, nickname, description } = req.body;
   const image = req.file;
-  const imageUrl = image.path;
 
   try {
+    const imageUrl = image.path;
+
     const existingUser = await pool.query(
       "SELECT login FROM users WHERE login = $1",
       [login]
