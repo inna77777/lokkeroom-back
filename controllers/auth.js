@@ -4,6 +4,9 @@ const pool = require("../db");
 
 exports.registerUser = async (req, res) => {
   const { login, password, nickname, description } = req.body;
+  const image = req.file;
+  const imageUrl = image.path;
+
   try {
     const existingUser = await pool.query(
       "SELECT login FROM users WHERE login = $1",
@@ -14,8 +17,8 @@ exports.registerUser = async (req, res) => {
     }
     const bcryptPassword = await bcrypt.hash(password, 12);
     const insertValues = await pool.query(
-      "INSERT INTO users (login, password, nickname, description) VALUES($1, $2,$3,$4) RETURNING *",
-      [login, bcryptPassword, nickname, description]
+      "INSERT INTO users (login, password, nickname, description, image) VALUES($1, $2,$3,$4, $5) RETURNING *",
+      [login, bcryptPassword, nickname, description, imageUrl]
     );
     res.json({ user: insertValues.rows[0] });
   } catch (err) {
@@ -74,7 +77,7 @@ exports.getUserData = async (req, res, next) => {
   const { id } = req.user;
   try {
     const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-    res.json({ user: user.rows});
+    res.json({ user: user.rows });
   } catch (err) {
     console.error("Error occurred while getting user data:", err);
     res.status(500).json({ error: "Internal Server Error" });
