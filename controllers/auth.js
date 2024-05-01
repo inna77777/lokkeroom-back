@@ -16,7 +16,7 @@ exports.registerUser = async (req, res) => {
     }
     const bcryptPassword = await bcrypt.hash(password, 12);
     const insertValues = await pool.query(
-      "INSERT INTO users (login, password, nickname, description, image) VALUES($1, $2,$3,$4, $5) RETURNING *",
+      "INSERT INTO users (login, password, nickname, description, image) VALUES($1, $2,$3,$4) RETURNING *",
       [login, bcryptPassword, nickname, description]
     );
     res.json({ user: insertValues.rows[0] });
