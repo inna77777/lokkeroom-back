@@ -217,13 +217,12 @@ exports.deleteUserFromLobby = async (req, res, next) => {
     );
 
     if (isAdmin.rows[0].exists) {
-      // If the user is an admin, delete the entire lobby and its associated data
-      await pool.query("DELETE FROM public.lobbies WHERE id = $1", [lobbyId]);
-
       // Delete all associated records in the users_lobbies table
       await pool.query("DELETE FROM public.users_lobbies WHERE lobby_id = $1", [
         lobbyId,
       ]);
+      // If the user is an admin, delete the entire lobby and its associated data
+      await pool.query("DELETE FROM public.lobbies WHERE id = $1", [lobbyId]);
     } else {
       // If the user is not an admin, just remove the user from the lobby
       await pool.query(
