@@ -236,6 +236,20 @@ exports.getChatUser = async (req, res, next) => {
   }
 };
 
+exports.deleteChat = async (req, res, next) => {
+  const { chatId } = req.params;
+  try {
+    await pool.query("DELETE FROM public.chat_messages WHERE chat_id = $1", [
+      chatId,
+    ]),
+      await pool.query("DELETE FROM public.chats WHERE chat_id = $1", [chatId]);
+
+    res.json("chat was deleted");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 // SELECT DISTINCT nickname
 //   FROM (
 //     SELECT u.nickname, cm.created_at
