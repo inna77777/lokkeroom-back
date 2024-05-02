@@ -87,9 +87,10 @@ exports.getLobbyMessages = async (req, res) => {
 exports.getLobbyInfo = async (req, res) => {
   const { lobbyId } = req.params;
   try {
-    const info = await pool.query("SELECT * FROM lobbies WHERE id = $1", [
-      lobbyId,
-    ]);
+    const info = await pool.query(
+      "SELECT l.*, count(*) as count  FROM lobbies l inner join users_lobbies ul on l.id =ul.lobby_id where l.id  = $1 group  by l.id ",
+      [lobbyId]
+    );
     res.json({ info: info.rows[0] });
   } catch (err) {
     console.error("Error occurred get l:", err);
