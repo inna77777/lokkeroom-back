@@ -185,9 +185,21 @@ exports.getPlatformUsersLobbies = async (req, res, next) => {
   try {
     const users = await pool.query("SELECT * FROM users WHERE id != $1", [id]);
 
-    const lobbies = await pool.query("SELECT * FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE user_id != $1 AND private=false", [
-      id,
-    ]);
+    const lobbies = await pool.query(
+      `SELECT 
+    l.*, 
+    COUNT(DISTINCT ul.user_id) as user_count
+FROM 
+    lobbies l
+INNER JOIN 
+    users_lobbies ul ON l.id = ul.lobby_id
+WHERE 
+    l.id NOT IN (SELECT ul.lobby_id FROM users_lobbies ul WHERE ul.user_id = 1) 
+    AND l.private = false
+GROUP BY 
+    l.id;`,
+      [id]
+    );
     res.json({ users: users.rows, lobbies: lobbies.rows });
   } catch (err) {
     console.error("Error occurred while getting user lobbies:", err);
