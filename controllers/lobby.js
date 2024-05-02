@@ -218,6 +218,9 @@ exports.deleteUserFromLobby = async (req, res, next) => {
 
     if (isAdmin.rows[0].exists) {
       // Delete all associated records in the users_lobbies table
+      await pool.query("DELETE FROM public.messages WHERE lobby_id = $1", [
+        lobbyId,
+      ]);
       await pool.query("DELETE FROM public.users_lobbies WHERE lobby_id = $1", [
         lobbyId,
       ]);
