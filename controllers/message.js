@@ -142,7 +142,7 @@ exports.sendUserToUserMess = async (req, res) => {
       };
 
       const createChatResult = await pool.query(createChatQuery);
-      chatId = createChatResult.rows[0].id;
+      chatId = createChatResult.rows[0].chat_id;
     }
 
     const inputedValues = await pool.query(
