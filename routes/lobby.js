@@ -43,7 +43,6 @@ router.get(
 router.post(
   "/api/lobby/:lobbyId/add-user/:userId",
   authGuard,
-  adminGuard,
   lobbyGuard,
   lobbyController.addUserToLobby
 );
@@ -57,6 +56,5 @@ router.delete(
 
 router.get("/user/lobbies", authGuard, lobbyController.getUserLobbies);
 router.get("/community", authGuard, lobbyController.getPlatformUsersLobbies);
-
 
 module.exports = router;
