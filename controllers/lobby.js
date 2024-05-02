@@ -88,7 +88,7 @@ exports.getLobbyInfo = async (req, res) => {
   const { lobbyId } = req.params;
   try {
     const info = await pool.query(
-      "SELECT l.*, count(*) as count, ul2.user_id as admin_id FROM lobbies l inner join users_lobbies ul on l.id = ul.lobby_id left join users_lobbies ul2 on l.id = ul2.lobby_id and ul2.admin = true where l.id = 2 group by l.id, ul2.user_id limit 1",
+      "SELECT l.*, count(*) as count, ul2.user_id as admin_id FROM lobbies l inner join users_lobbies ul on l.id = ul.lobby_id left join users_lobbies ul2 on l.id = ul2.lobby_id and ul2.admin = true where l.id = $1 group by l.id, ul2.user_id limit 1",
       [lobbyId]
     );
     res.json({ info: info.rows[0] });
