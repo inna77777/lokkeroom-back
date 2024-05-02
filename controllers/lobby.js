@@ -44,7 +44,7 @@ exports.getLobbyUsers = async (req, res) => {
 
   try {
     const userInLobby = await pool.query(
-      "SELECT u.id, u.login,u.nickname, ul.lobby_id FROM users u INNER JOIN users_lobbies ul ON u.id = ul.user_id WHERE ul.lobby_id = $1",
+      "SELECT u.id, u.login,u.nickname,u.created_at, ul.lobby_id FROM users u INNER JOIN users_lobbies ul ON u.id = ul.user_id WHERE ul.lobby_id = $1 order by u.nickname asc",
       [lobbyId]
     );
     res.json({
