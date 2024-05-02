@@ -47,7 +47,7 @@ router.post(
   lobbyGuard,
   lobbyController.addUserToLobby
 );
-router.post(
+router.delete(
   "/api/lobby/:lobbyId/remove-user/:userId",
   authGuard,
   adminGuard,
