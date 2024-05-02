@@ -194,7 +194,7 @@ FROM
 INNER JOIN 
     users_lobbies ul ON l.id = ul.lobby_id
 WHERE 
-    l.id NOT IN (SELECT ul.lobby_id FROM users_lobbies ul WHERE ul.user_id = 1) 
+    l.id NOT IN (SELECT ul.lobby_id FROM users_lobbies ul WHERE ul.user_id = $1) 
     AND l.private = false
 GROUP BY 
     l.id;`,
