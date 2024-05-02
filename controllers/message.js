@@ -239,7 +239,7 @@ exports.getChatUser = async (req, res, next) => {
 exports.deleteChat = async (req, res, next) => {
   const { chatId } = req.params;
   try {
-    await pool.query("DELETE FROM public.chat_messages WHERE chat_id = $1", [
+    await pool.query("DELETE FROM public.chats_messages WHERE chat_id = $1", [
       chatId,
     ]),
       await pool.query("DELETE FROM public.chats WHERE chat_id = $1", [chatId]);
