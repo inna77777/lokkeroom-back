@@ -56,5 +56,10 @@ router.delete(
 
 router.get("/user/lobbies", authGuard, lobbyController.getUserLobbies);
 router.get("/community", authGuard, lobbyController.getPlatformUsersLobbies);
+router.delete(
+  "/delete/lobby/:lobbyId/user/:userId",
+  authGuard,
+  lobbyController.deleteUserFromLobby
+);
 
 module.exports = router;

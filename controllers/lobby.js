@@ -207,4 +207,32 @@ GROUP BY
   }
 };
 
-// "SELECT l.* FROM lobbies l INNER JOIN users_lobbies ul ON l.id = ul.lobby_id WHERE ul.user_id = $1"
+exports.deleteUserFromLobby = async (req, res, next) => {
+  const { userId, lobbyId } = req.params;
+  try {
+    // Check if the user is an admin of the lobby
+    const isAdmin = await pool.query(
+      "SELECT EXISTS (SELECT 1 FROM public.users_lobbies WHERE user_id = $1 AND lobby_id = $2 AND admin)",
+      [userId, lobbyId]
+    );
+
+    if (isAdmin.rows[0].exists) {
+      // If the user is an admin, delete the entire lobby and its associated data
+      await pool.query("DELETE FROM public.lobbies WHERE id = $1", [lobbyId]);
+
+      // Delete all associated records in the users_lobbies table
+      await pool.query("DELETE FROM public.users_lobbies WHERE lobby_id = $1", [
+        lobbyId,
+      ]);
+    } else {
+      // If the user is not an admin, just remove the user from the lobby
+      await pool.query(
+        "DELETE FROM public.users_lobbies WHERE user_id = $1 AND lobby_id = $2",
+        [userId, lobbyId]
+      );
+    }
+    res.json("user was deleted");
+  } catch (err) {
+    console.error(err);
+  }
+};
