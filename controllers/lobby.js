@@ -2,11 +2,12 @@ const pool = require("../db");
 
 exports.createLobby = async (req, res) => {
   const { name } = req.body;
+  const { private } = req.body;
   const { id } = req.user;
   try {
     const insertedValues = await pool.query(
-      "INSERT INTO lobbies (name) VALUES($1) RETURNING *",
-      [name]
+      "INSERT INTO lobbies (name, private) VALUES($1, $2) RETURNING *",
+      [name, private]
     );
     await pool.query(
       "INSERT INTO users_lobbies (user_id, lobby_id, admin) VALUES($1, $2, $3)",
