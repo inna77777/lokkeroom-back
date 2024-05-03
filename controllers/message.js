@@ -76,7 +76,72 @@ exports.updateMessage = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+exports.updateChatMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { id: userId } = req.user;
+  const { message: newMessageContent } = req.body;
 
+  try {
+    const isUserWhoCreatedMess = await pool.query(
+      "SELECT * FROM chat_messages WHERE id = $1 AND user_id = $2",
+      [messageId, userId]
+    );
+
+    if (isUserWhoCreatedMess.rowCount > 0) {
+      const oldMessage = await pool.query(
+        "SELECT * FROM chat_messages WHERE id = $1",
+        [messageId]
+      );
+
+      await pool.query(
+        "UPDATE chat_messages SET content = $1 WHERE id = $2 AND user_id = $3",
+        [newMessageContent, messageId, userId]
+      );
+
+      return res.json({
+        message: "Message updated successfully",
+        oldContent: oldMessage.rows[0].content,
+        newContent: newMessageContent,
+      });
+    }
+
+    res.json({
+      error: "You updated the mess",
+    });
+  } catch (err) {
+    console.error("Error occurred while updating message:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
+exports.deleteChatMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { id: userId } = req.user;
+
+  try {
+    const isUserWhoCreatedMess = await pool.query(
+      "SELECT * FROM chat_messages WHERE id = $1 AND user_id = $2",
+      [messageId, userId]
+    );
+
+    if (isUserWhoCreatedMess.rowCount > 0) {
+      await pool.query("DELETE FROM chat_messages WHERE id = $1 AND user_id = $2", [
+        messageId,
+        userId,
+      ]);
+      return res.json({ message: "message was deleted" });
+    }
+
+    res.json({
+      message: "blabla",
+    });
+  } catch (err) {
+    console.error("Error occurred while adding user to lobby:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 exports.deleteMessage = async (req, res) => {
   const { messageId } = req.params;
   const { id: userId } = req.user;

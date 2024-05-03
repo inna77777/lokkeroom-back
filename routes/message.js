@@ -17,6 +17,19 @@ router.patch(
   messageGuard,
   messageController.updateMessage
 );
+router.patch(
+  "/api/chat/message/:messageId",
+  authGuard,
+  messageGuard,
+  messageController.updateChatMessage
+);
+
+router.delete(
+  "/api/chat/messages/:messageId",
+  authGuard,
+  messageGuard,
+  messageController.deleteChatMessage
+);
 router.delete(
   "/api/messages/:messageId",
   authGuard,
