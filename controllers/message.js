@@ -100,8 +100,6 @@ exports.updateChatMessage = async (req, res) => {
 
       return res.json({
         message: "Message updated successfully",
-        oldContent: oldMessage.rows[0].content,
-        newContent: newMessageContent,
       });
     }
 
