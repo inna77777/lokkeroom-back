@@ -83,18 +83,18 @@ exports.updateChatMessage = async (req, res) => {
 
   try {
     const isUserWhoCreatedMess = await pool.query(
-      "SELECT * FROM chat_messages WHERE id = $1 AND user_id = $2",
+      "SELECT * FROM chats_messages WHERE id = $1 AND user_id = $2",
       [messageId, userId]
     );
 
     if (isUserWhoCreatedMess.rowCount > 0) {
       const oldMessage = await pool.query(
-        "SELECT * FROM chat_messages WHERE id = $1",
+        "SELECT * FROM chats_messages WHERE id = $1",
         [messageId]
       );
 
       await pool.query(
-        "UPDATE chat_messages SET content = $1 WHERE id = $2 AND user_id = $3",
+        "UPDATE chats_messages SET content = $1 WHERE id = $2 AND user_id = $3",
         [newMessageContent, messageId, userId]
       );
 
@@ -114,23 +114,21 @@ exports.updateChatMessage = async (req, res) => {
   }
 };
 
-
-
 exports.deleteChatMessage = async (req, res) => {
   const { messageId } = req.params;
   const { id: userId } = req.user;
 
   try {
     const isUserWhoCreatedMess = await pool.query(
-      "SELECT * FROM chat_messages WHERE id = $1 AND user_id = $2",
+      "SELECT * FROM chats_messages WHERE id = $1 AND user_id = $2",
       [messageId, userId]
     );
 
     if (isUserWhoCreatedMess.rowCount > 0) {
-      await pool.query("DELETE FROM chat_messages WHERE id = $1 AND user_id = $2", [
-        messageId,
-        userId,
-      ]);
+      await pool.query(
+        "DELETE FROM chats_messages WHERE id = $1 AND user_id = $2",
+        [messageId, userId]
+      );
       return res.json({ message: "message was deleted" });
     }
 
