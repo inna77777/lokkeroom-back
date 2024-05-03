@@ -219,20 +219,6 @@ exports.sendUserToUserMess = async (req, res) => {
     console.error("Error occurred while adding user to lobby:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
-
-  // try {
-  //   const inputedValues = await pool.query(
-  //     "INSERT INTO private_messages (content, user_sender_id, user_receiver_id) VALUES($1,$2,$3) RETURNING *",
-  //     [message, userId, recId]
-  //   );
-  //   res.json({
-  //     message: "message was sent",
-  //     content: inputedValues.rows[0],
-  //   });
-  // } catch (err) {
-  //   console.error("Error occurred while adding user to lobby:", err);
-  //   res.status(500).json({ error: "Internal Server Error" });
-  // }
 };
 
 exports.getUserChats = async (req, res, next) => {
@@ -267,7 +253,7 @@ exports.getChatMessages = async (req, res, next) => {
   try {
     const result = await pool.query(
       `
-      SELECT * FROM chats_messages WHERE chat_id = $1
+      SELECT * FROM chats_messages WHERE chat_id = $1 order  by created_at  asc 
       `,
       [chatId]
     );
