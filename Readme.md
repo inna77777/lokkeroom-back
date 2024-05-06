@@ -47,3 +47,10 @@ Express.js
 PostgreSQL
 bcrypt
 JSON Web Tokens (JWT)
+
+
+## What do i wanna add?
+
+
+Some styles
+Uploading images as avatars 
