@@ -39,6 +39,22 @@ Messaging
 **GET /api/chat/friend/:userId:** Retrieve information about a specific user who is a chat partner.
 **DELETE /delete/chat/:chatId:** Delete a chat and its associated messages.
 
+## Tables
+**chats:** Stores information about individual chat sessions between users.
+Columns: chat_id, user_id, chat_with_id
+**chats_messages:** Records messages exchanged within chats.
+Columns: id, chat_id, content, created_at, user_id
+**failed_login_attempts:** Logs failed login attempts for security monitoring.
+Columns: id, login, timestamp
+**lobbies:** Manages information related to chat lobbies.
+Columns: id, name, created_at, private
+**messages:** Contains messages sent within lobbies.
+Columns: id, content, user_id, lobby_id, created_at
+**users:** Stores user account details.
+Columns: login, password, id, nickname, description, created_at
+**users_lobbies:** Manages user participation in lobbies.
+Columns: id, user_id, lobby_id, admin
+
 
 
 Technologies Used
