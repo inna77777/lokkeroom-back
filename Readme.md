@@ -8,11 +8,15 @@ Lockeroom backend provides a RESTful API for user registration, authentication, 
 User Authentication: Handles user registration and login securely using bcrypt hashing and JWT token generation.
 
 User Data Retrieval: Retrieves user data based on the provided JWT token.
+
 Lobby Management: Allows users to create lobbies, add or remove users from lobbies, and fetch information about lobbies and their members.
+
 Messaging: Enables users to send messages within lobbies and chats, update or delete messages, and retrieve message history.
+
 Community Interaction: Provides functionality to view lobbies available to the community, excluding those already joined by the user.
-API Endpoints
-Authentication
+
+## API Endpoints
+
 **POST /api/register:** Register a new user.
 
 **POST /api/login:** Login user and generate JWT token.
