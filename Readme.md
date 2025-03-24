@@ -129,7 +129,7 @@ The backend system uses a **PostgreSQL** database to manage the following entiti
 How to Get Started
 1. Clone the Repository
   ```bash
-https://github.com/inna77777/lokkeroom-front.git](https://github.com/inna77777/lokkeroom-back.git
+git clone https://github.com/inna77777/lokkeroom-back.git
 ```
 
 2.Navigate to the project directory:
