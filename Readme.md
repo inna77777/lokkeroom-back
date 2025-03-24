@@ -1,107 +1,150 @@
 # Lockeroom Backend
-Lockeroom is a messaging and lobby management system designed to facilitate communication and collaboration among users.
+
+Lockeroom is a powerful messaging and lobby management system designed to facilitate secure communication and collaboration among users. It provides a robust backend API built using **Node.js** and **Express.js**, ensuring fast and efficient handling of user requests while ensuring scalability and maintainability. Lockeroom leverages **PostgreSQL** as the database to store and manage user data, messages, and lobby information securely.
 
 ## Overview
-Lockeroom backend provides a RESTful API for user registration, authentication, lobby management, and messaging functionalities. It ensures secure communication and efficient handling of user data.
 
-## Features
-User Authentication: Handles user registration and login securely using bcrypt hashing and JWT token generation.
+The Lockeroom backend exposes a **RESTful API** for various features like user authentication, lobby creation, messaging, and community interaction. This allows users to register, log in, join lobbies, send messages, and interact with other members efficiently.
 
-User Data Retrieval: Retrieves user data based on the provided JWT token.
+### Key Features:
 
-Lobby Management: Allows users to create lobbies, add or remove users from lobbies, and fetch information about lobbies and their members.
+1. **User Authentication**:
+   - Secure user registration and login using **bcrypt** for password hashing.
+   - JWT (JSON Web Tokens) are used for authentication and authorization, ensuring secure communication between clients and the server.
 
-Messaging: Enables users to send messages within lobbies and chats, update or delete messages, and retrieve message history.
+2. **User Data Retrieval**:
+   - Users can retrieve their profile data based on their JWT token.
 
-Community Interaction: Provides functionality to view lobbies available to the community, excluding those already joined by the user.
+3. **Lobby Management**:
+   - Users can create and manage lobbies, which are essentially rooms where users can communicate.
+   - Lobbies can be public or private, and users can join or leave them at any time.
+   - Users can manage other users within the lobby, including adding and removing members.
+
+4. **Messaging**:
+   - Users can send messages in lobbies and private chats.
+   - Messages can be updated or deleted, providing complete control over the chat history.
+   - The system stores the history of messages in each lobby or chat session, making it possible for users to retrieve past conversations.
+
+5. **Community Interaction**:
+   - The system allows users to browse and join lobbies that are available to the community, excluding those they are already a part of.
+   - Users can also view details of specific lobbies they are interested in, even if they haven't joined yet.
+
+---
 
 ## API Endpoints
 
-**POST /api/register:** Register a new user.
+### **User Authentication**
 
-**POST /api/login:** Login user and generate JWT token.
+- **POST /api/register**: Registers a new user. The body should contain the user's `login`, `password`, `nickname`, and `description`.
+- **POST /api/login**: Logs in a user and generates a JWT token for authenticated communication.
+- **GET /api/user**: Retrieves user data based on the JWT token.
 
-**GET /api/user:** Retrieve user data based on JWT token.
-Lobby Management
+### **Lobby Management**
 
-**POST /api/lobbies:** Create a new lobby.
+- **POST /api/lobbies**: Creates a new lobby. The body should contain the lobby's `name`, and whether it is `private`.
+- **GET /api/lobby/:lobbyId/user/:userId**: Retrieves information about a specific user within a lobby.
+- **GET /api/lobby/:lobbyId/users**: Retrieves a list of users in a specific lobby.
+- **GET /api/lobby/:lobbyId**: Retrieves messages within a specific lobby.
+- **GET /api/lobby/info/:lobbyId**: Retrieves detailed information about a specific lobby.
+- **GET /api/lobby/:lobbyId/:messageId**: Retrieves a single message within a specific lobby.
+- **POST /api/lobby/:lobbyId/add-user/:userId**: Adds a user to a specific lobby.
+- **DELETE /api/lobby/:lobbyId/remove-user/:userId**: Removes a user from a specific lobby.
+- **GET /user/lobbies**: Retrieves a list of lobbies that the authenticated user belongs to.
+- **GET /community**: Retrieves lobbies that are available to the community.
+- **DELETE /delete/lobby/:lobbyId/user/:userId**: Deletes a user from a specific lobby.
 
-**GET /api/lobby/:lobbyId/user/:userId:** Retrieve information about a specific user within a lobby.
+### **Messaging**
 
-**GET /api/lobby/:lobbyId/users:** Retrieve a list of users belonging to a specific lobby.
+- **POST /api/lobby/:lobbyId**: Posts a message to a specific lobby.
+- **PATCH /api/lobby/message/:messageId**: Updates a message within a lobby.
+- **PATCH /api/chat/message/:messageId**: Updates a message within a chat.
+- **DELETE /api/chat/messages/:messageId**: Deletes a message within a chat.
+- **DELETE /api/messages/:messageId**: Deletes a message within a lobby.
+- **POST /api/chat/user/:recId**: Sends a message from one user to another in a chat.
+- **GET /api/user/chats**: Retrieves a list of chats the user is involved in.
+- **GET /api/chat/:chatId**: Retrieves messages from a specific chat.
+- **GET /api/chat/friend/:userId**: Retrieves information about a specific user who is a chat partner.
+- **DELETE /delete/chat/:chatId**: Deletes a chat and its associated messages.
 
-**GET /api/lobby/:lobbyId:** Retrieve messages within a specific lobby.
+---
 
-**GET /api/lobby/info/:lobbyId:** Retrieve information about a specific lobby.
+## Database Schema
 
-**GET /api/lobby/:lobbyId/:messageId:** Retrieve a single message within a specific lobby.
+The backend system uses a **PostgreSQL** database to manage the following entities:
 
-**POST /api/lobby/:lobbyId/add-user/:userId:** Add a user to a specific lobby.
+### **Users**
+- `users`: Stores user details.
+  - Columns: `login`, `password`, `id`, `nickname`, `description`, `created_at`
+  
+### **Chats**
+- `chats`: Stores chat session information.
+  - Columns: `chat_id`, `user_id`, `chat_with_id`
+- `chats_messages`: Records messages within chats.
+  - Columns: `id`, `chat_id`, `content`, `created_at`, `user_id`
 
-**DELETE /api/lobby/:lobbyId/remove-user/:userId:** Remove a user from a specific lobby.
+### **Failed Login Attempts**
+- `failed_login_attempts`: Logs failed login attempts for monitoring and security purposes.
+  - Columns: `id`, `login`, `timestamp`
 
-**GET /user/lobbies:** Retrieve a list of lobbies that the authenticated user belongs to.
+### **Lobbies**
+- `lobbies`: Stores information about the chat lobbies.
+  - Columns: `id`, `name`, `created_at`, `private`
+- `messages`: Stores messages within lobbies.
+  - Columns: `id`, `content`, `user_id`, `lobby_id`, `created_at`
 
-**GET /community:** Retrieve lobbies available to the community.
+### **User-Lobby Relationships**
+- `users_lobbies`: Manages the users' participation in lobbies (with admin roles).
+  - Columns: `id`, `user_id`, `lobby_id`, `admin`
 
-**DELETE /delete/lobby/:lobbyId/user/:userId:** Delete a user from a specific lobby.
-Messaging
+---
 
-**POST /api/lobby/:lobbyId:** Post a message to a specific lobby.
+## Technologies Used
 
-**PATCH /api/lobby/message/:messageId:** Update a message within a lobby.
+- **Node.js**: The runtime environment for executing JavaScript code on the server.
+- **Express.js**: Web framework for building the RESTful API.
+- **PostgreSQL**: Database for managing user data, chat history, and lobby information.
+- **bcrypt**: Library for hashing passwords to ensure secure authentication.
+- **JSON Web Tokens (JWT)**: Secure token-based authentication for users.
 
-**PATCH /api/chat/message/:messageId:** Update a message within a chat.
+---
 
-**DELETE /api/chat/messages/:messageId:** Delete a message within a chat.
+## Security Considerations
 
-**DELETE /api/messages/:messageId:** Delete a message within a lobby.
+1. **JWT Authentication**: All endpoints that require user identification are protected using JWT tokens. Users must authenticate with a valid token to access these endpoints.
+2. **Password Hashing**: Passwords are hashed using bcrypt before being stored in the database to prevent password leakage.
+3. **Rate Limiting**: The system may implement rate limiting for login attempts to prevent brute-force attacks.
+4. **Private Lobbies**: Users can create private lobbies to restrict access to only invited members.
 
-**POST /api/chat/user/:recId:** Send a message from one user to another.
+---
 
-**GET /api/user/chats:** Retrieve a list of user's chats.
+## Future Enhancements
 
-**GET /api/chat/:chatId:** Retrieve messages from a specific chat.
+1. **Push Notifications**: Adding real-time notifications for new messages or updates in lobbies.
+2. **File Uploads**: Allowing users to send files (images, documents) within chats or lobbies.
+3. **User Roles**: Introducing more roles and permissions, such as moderators and administrators within lobbies.
+4. **Search Functionality**: Implementing the ability to search for users, chats, or lobbies.
 
-**GET /api/chat/friend/:userId:** Retrieve information about a specific user who is a chat partner.
+---
 
-**DELETE /delete/chat/:chatId:** Delete a chat and its associated messages.
+How to Get Started
+1. Clone the Repository
+  ```bash
+https://github.com/inna77777/lokkeroom-front.git](https://github.com/inna77777/lokkeroom-back.git
+```
 
-## Tables
+2.Navigate to the project directory:
+```bash
+cd lokkeroom-back
+```
+3. Install Dependencies
+```bash
+npm install
 
-**chats:** Stores information about individual chat sessions between users.
-Columns: chat_id, user_id, chat_with_id
+```
 
-**chats_messages:** Records messages exchanged within chats.
-Columns: id, chat_id, content, created_at, user_id
-
-**failed_login_attempts:** Logs failed login attempts for security monitoring.
-Columns: id, login, timestamp
-
-**lobbies:** Manages information related to chat lobbies.
-Columns: id, name, created_at, private
-
-**messages:** Contains messages sent within lobbies.
-Columns: id, content, user_id, lobby_id, created_at
-
-**users:** Stores user account details.
-Columns: login, password, id, nickname, description, created_at
-
-**users_lobbies:** Manages user participation in lobbies.
-Columns: id, user_id, lobby_id, admin
-
-
-
-Technologies Used
-Node.js
-Express.js
-PostgreSQL
-bcrypt
-JSON Web Tokens (JWT)
+4. Run project
+```bash
+npm start
+```
 
 
-## What do i wanna add?
-
-
-Some styles
-Uploading images as avatars 
